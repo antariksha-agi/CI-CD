@@ -85,10 +85,57 @@ All checks pass	Workflow turns green ✅
 When starting a new Python project:
 1. Create .github/workflows/.
 2. Copy ci.yml into it.
-3. Change Python version if required.
+3. Change Python version if required. 
 4. Make sure your requirements.txt exists.
 5. Make sure your tests can run with pytest.
 6. Push to GitHub.
 For FastAPI, agents, RAG projects and Python backends, this is a good starting CI template. Larger projects will eventually need database integration tests, security checks, type checking, Docker builds and evaluation pipelines—but don't add complexity until the project needs it.
 
 This is your starter CI template. Save it; you don't need to reinvent the workflow every time. 😎
+
+.github/workflows/ci.yml
+
+
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with Ruff
+        run: |
+          pip install ruff
+          ruff check .
+
+      - name: Run tests
+        run: |
+          python -m pytest -v
+my-project/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── app/
+├── tests/
+├── requirements.txt
+└── .gitignore
